@@ -29,20 +29,21 @@ async function initializeDatabase() {
 
 const app = createApp(config);
 
-const handler = async (req, res) => {
+// Export the Express app directly for Vercel.
+app.use(async (req, res, next) => {
   try {
     await initializeDatabase();
-    return app(req, res);
+    next();
   } catch (error) {
     console.error(
       'SpaceGuard initialization failed:',
       error.code || error.name,
     );
 
-    return res.status(503).json({
+    res.status(503).json({
       error: 'Service temporarily unavailable',
     });
   }
-};
+});
 
-export default handler;
+export default app;
